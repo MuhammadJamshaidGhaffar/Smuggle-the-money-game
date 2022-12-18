@@ -116,12 +116,14 @@ void getInput(char* name, int max_chars ,const char* label, float screenWidth , 
 //-----------------                       ----------------------------
 //--------------------------------------------------------------------
 void initButton(Button* button , Vector2 position , char* text) {
-	button->padding = (Padding){ 10,10,10,10 };
+	button->padding = (Padding){ 20,20,20,20 };
 	button->position = (Vector2){ position.x,position.y };
 	button->text = text;
 	button->background_color = RED;
 	button->font_color = WHITE;
-	button->fontSize = 20;
+	button->borderColor = WHITE;
+	button->borderThickness = (BorderThickness){ 0,0,0,0};
+	button->fontSize = 30;
 	button->background_color_on_click = DARKGREEN;
 	button->font_color_on_click = WHITE;
 	button->background_color_on_hover = BLUE;
@@ -151,24 +153,40 @@ void drawButton(Button* button) {
 	{
 	case NOT_HOVER:
 		DrawRectangle(button->position.x , button->position.y ,getButtonWidth(*button),getButtonHeight(*button), button->background_color);
-		DrawText(button->text, button->position.x + button->padding.left, button->position.y + button->padding.top, button->fontSize, button->font_color);
+		DrawText(button->text, button->position.x+ button->borderThickness.right + button->padding.left, button->position.y + button->padding.top+button->borderThickness.top, button->fontSize, button->font_color);
+		drawButtonBorder(*button);
 
 		break;
 	case HOVER:
 		DrawRectangle(button->position.x, button->position.y, getButtonWidth(*button), getButtonHeight(*button), button->background_color_on_hover);
-		DrawText(button->text, button->position.x + button->padding.left, button->position.y + button->padding.top, button->fontSize, button->font_color_on_hover);
+		DrawText(button->text, button->position.x + button->borderThickness.right + button->padding.left, button->position.y + button->padding.top + button->borderThickness.top, button->fontSize, button->font_color_on_hover);
+		drawButtonBorder(*button);
 		break;
 	case CLICKED:
 
 		DrawRectangle(button->position.x, button->position.y, getButtonWidth(*button), getButtonHeight(*button), button->background_color_on_click);
-		DrawText(button->text, button->position.x + button->padding.left, button->position.y + button->padding.top, button->fontSize, button->font_color_on_click);
-			
+		DrawText(button->text, button->position.x + button->borderThickness.right + button->padding.left, button->position.y + button->padding.top + button->borderThickness.top, button->fontSize, button->font_color_on_click);
+		drawButtonBorder(*button);
 			// move the rect back to its position
 		button->position.x -= button->clicked_animation_move_by.x;
 		button->position.y -= button->clicked_animation_move_by.y;
 		break;
 
 	}
+	
+}
+
+void drawButtonBorder(Button button) {
+	//top
+	DrawRectangle(button.position.x, button.position.y, getButtonWidth(button), button.borderThickness.top, button.borderColor);
+	//bottom
+	DrawRectangle(button.position.x, button.position.y+getButtonHeight(button)- button.borderThickness.bottom, getButtonWidth(button), button.borderThickness.bottom, button.borderColor);
+	//right
+	DrawRectangle(button.position.x+getButtonWidth(button) - button.borderThickness.right, button.position.y , button.borderThickness.right, getButtonHeight(button), button.borderColor);
+	//left
+	DrawRectangle(button.position.x, button.position.y, button.borderThickness.left, getButtonHeight(button), button.borderColor);
+
+
 }
 
 int isButtonHover(Button button) {
@@ -184,15 +202,22 @@ int isButtonPressed(Button button) {
 }
 
 int getButtonWidth(Button button) {
-	return button.padding.left + MeasureText(button.text , button.fontSize) + button.padding.right;
+	return  button.borderThickness.left+button.padding.left + MeasureText(button.text , button.fontSize) + button.padding.right+button.borderThickness.right;
 }
 
 int getButtonHeight(Button button) {
-	return button.padding.top+ button.fontSize + button.padding.bottom;
+	return  button.borderThickness.top+button.padding.top+ button.fontSize + button.padding.bottom+button.borderThickness.bottom;
 }
 
 Rectangle getButtonRect(Button button) {
 	return (Rectangle) { button.position.x, button.position.y, getButtonWidth(button), getButtonHeight(button) };
+}
+
+void setButtonAtCertainMarginXFromBtn(Button* button_to_place, Button from_button , float x) {
+	button_to_place->position.x = from_button.position.x + getButtonWidth(from_button) + x;
+}
+void setButtonAtCertainMarginYFromBtn(Button* button_to_place, Button from_button , float y) {
+	button_to_place->position.y = from_button.position.y + getButtonHeight(from_button) + y;
 }
 
 //--------------------------------------------------------------------

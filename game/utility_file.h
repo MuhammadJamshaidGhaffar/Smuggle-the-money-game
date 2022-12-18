@@ -20,7 +20,7 @@ typedef struct Padding {
 	int right;
 	int bottom;
 	int left;
-}Padding ;
+}Padding , BorderThickness ;
 
 typedef enum ButtonState {
 	CLICKED,
@@ -35,6 +35,8 @@ typedef struct Button {
 	char* text;
 	Color background_color;
 	Color font_color;
+	Color borderColor;
+	BorderThickness borderThickness;
 	int fontSize;
 	Color background_color_on_click;
 	Color font_color_on_click;
@@ -74,13 +76,15 @@ int  isCollidedWithWallsEx(Rectangle rect, RectEx* walls,unsigned int walls_leng
 void getInput(char* name, int max_chars ,const char* label, float screenWidth , InputType inputType);
 void initButton(Button* button, Vector2 position, char* text);
 void drawButton(Button* button);
+void drawButtonBorder(Button button);
 int isButtonHover(Button button);
 int isButtonDown(Button button);
 int isButtonPressed(Button button);
 int getButtonWidth(Button button);
 int getButtonHeight(Button button);
 Rectangle getButtonRect(Button button);
-
+void setButtonAtCertainMarginFromBtn(Button* button_to_place, Button from_button, float x);
+void setButtonAtCertainMarginYFromBtn(Button* button_to_place, Button from_button, float y);
 //----------------    TEXT EDIT      ---------------------
 void initTextEdit(TextEdit* textEdit, Vector2 position , const char* buffer , int buffer_size);
 int isTextEditHover(TextEdit textEdit);

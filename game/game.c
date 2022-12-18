@@ -22,6 +22,7 @@
 #define MAX_RECT 200
 #define MAX_INPUT_TEXT 30
 #define MAX_INPUT_NUM 6
+#define PLAYER_NAME_LEN 30
 
 //----------------   GLOBAL CONSTANTS     --------------------
 //const int screenWidth = 1800;
@@ -30,14 +31,17 @@ const int screenHeight = 900;
 const int screenWidth = 16.0f/9.0f*900;
 
 //----------------   GLOBAL VARIABLES     --------------------
-
+char player_1_name[PLAYER_NAME_LEN + 1] = "Player 1";
+char player_2_name[PLAYER_NAME_LEN + 1] = "Player 2";
 
 
 //-----------------    STRUCTURES   --------------------------
 
 //-----------------    FUNCTIONS    --------------------------
 void startMenu();
-void mainGame();
+void settingsScene();
+void creditsScene();
+void mainGameScene();
 //-----------------      MAIN       --------------------------   
 
 void main() {
@@ -58,63 +62,128 @@ void main() {
 //---------------------------------------------------------------
 void startMenu() {
 	SetTargetFPS(60);
+	//--------- Local Constants ----------
+	const int baseX = 649;
+	const int baseY = 265;
+	//--------- Variables ------------
+	Button newGameBtn , settingsBtn , creditsBtn;
 
-	Button newGameBtn;
+	initButton(&newGameBtn , (Vector2){baseX , baseY} , "NewGame");
+	newGameBtn.borderThickness = (BorderThickness){ 0,0,2,0 };
+	
+	initButton(&settingsBtn , (Vector2){baseX,0 }, "Settings");
+	setButtonAtCertainMarginYFromBtn(&settingsBtn, newGameBtn, 40);
+	settingsBtn.borderThickness = (BorderThickness){ 0,0,2,0 };
+	
+	initButton(&creditsBtn , (Vector2){baseX,0 }, "Credits");
+	setButtonAtCertainMarginYFromBtn(&creditsBtn, settingsBtn, 40);
+	creditsBtn.borderThickness = (BorderThickness){ 0,0,2,0 };
 
-	initButton(&newGameBtn , (Vector2){20,20} , "Click Here");
-	newGameBtn.padding.top = 100;
-	Button btn2;
-	initButton(&btn2, (Vector2) { 20, 260 }, "2nd Button");
-
-
-	char str[] = "12345";
-	TextEdit textEdit;
-	initTextEdit(&textEdit, (Vector2) { 200, 100 } , str , sizeof(str));
-	setTextEditFontSize(&textEdit, 100);
-
-	char str2[20] = "123124234";
-	TextEdit edit2;
-	initTextEdit(&edit2, (Vector2) { 500, 0 }, str2 , sizeof(str2));
-	edit2.type = NUMBER;
-	edit2.activate_with_mouse = 0;
 	
 	while (1) {
+		if(IsMouseButtonPressed(MOUSE_LEFT_BUTTON))
+		printf("\n( %d , %d )", GetMouseX(), GetMouseY());
+
 		if (WindowShouldClose())
 			CloseWindow();
 
-		if (isButtonPressed(newGameBtn)) {
-			printf("\nButton has been clicked");
+		if (isButtonPressed(newGameBtn))
+			mainGameScene();
+		if (isButtonPressed(settingsBtn))
+			settingsScene();
+		if (isButtonPressed(creditsBtn)) {
+			creditsScene();
 		}
-		if (CheckCollisionPointCircle(GetMousePosition(), (Vector2) { 700, 700 }, 10) || isTextEditHover(textEdit))
-			textEdit.textEditState = ACTIVE;
-		else
-			textEdit.textEditState = INACTIVE;
-
 
 		BeginDrawing();
 		ClearBackground(BLACK);
 		drawButton(&newGameBtn );
-		drawButton(&btn2 );
-		drawTextEdit(&textEdit);
-		drawTextEdit(&edit2);
-		DrawCircle(700, 700, 10, MAGENTA);
-
+		drawButton(&settingsBtn);
+		drawButton(&creditsBtn);
 		EndDrawing();
 
 	}
 }
 
+void settingsScene() {
+	SetTargetFPS(60);
+
+	Button backBtn;
+	initButton(&backBtn, (Vector2) { 63, 50 }, "Go Back");
+
+	TextEdit player_1_name_edit;
+	initTextEdit(&player_1_name_edit, (Vector2) { 226, 272 } , player_1_name , sizeof(player_1_name));
+	setTextEditFontSize(&player_1_name_edit, 50);
+	
+	TextEdit player_2_name_edit;
+	initTextEdit(&player_2_name_edit, (Vector2) { 226, 495 } , player_2_name , sizeof(player_2_name));
+	setTextEditFontSize(&player_2_name_edit, 50);
+
+	while (1) {
+#ifdef DEVELOPING_MODE
+		if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON))
+			printf("\n( %d , %d )", GetMouseX(), GetMouseY());
+#endif
+		if (WindowShouldClose())
+			CloseWindow();
+		if (isButtonPressed(backBtn))
+			break;
+
+		BeginDrawing();
+		ClearBackground(BLACK);
+		drawButton(&backBtn);
+		// Display Label for player 1 Name
+		DrawText("Player 1 Name", 226, 200, 50, GREEN);
+		drawTextEdit(&player_1_name_edit);
+		// Display Label for player 1 Name
+		DrawText("Player 2 Name", 226, 423, 50, BLUE);
+		drawTextEdit(&player_2_name_edit);
+		EndDrawing();
+	}
+}
+
+void creditsScene() {
+	SetTargetFPS(10);
+
+	Button backBtn;
+	initButton(&backBtn, (Vector2) { 63, 50 }, "Go Back");
+
+
+	while (1) {
+#ifdef DEVELOPING_MODE
+		if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON))
+			printf("\n( %d , %d )", GetMouseX(), GetMouseY());
+#endif
+		if (WindowShouldClose())
+			CloseWindow();
+		if (isButtonPressed(backBtn))
+			break;
+
+		BeginDrawing();
+		ClearBackground(BLACK);
+		drawButton(&backBtn);
+		DrawText("Created By : ", 450, 265, 50, GREEN);
+		DrawText("Muhammad Jamshaid Ghffar", 678, 370, 50, RED);
+		EndDrawing();
+	}
+}
 
 //---------------------------------------------------------------
 //---------------                     ---------------------------
 //---------------   MAIN GAME SCENE   ---------------------------
 //---------------                     ---------------------------
 //---------------------------------------------------------------
-void mainGame() {
+void mainGameScene() {
+
 	SetTargetFPS(60);
 	//-------------		LOCAL CONSTANTS   ---------------------
+	const int headerHeight = 100;
 
 	//-------------     LOCAL VARIABLES   ---------------------
+	int player_1_money = 0;
+	int player_2_money = 0;
+	int turn = 1;
+
 	Camera2D camera = {0};
 	RectEx baseA, baseB, inspectionRoom;
 	Player player;
@@ -185,6 +254,10 @@ void mainGame() {
 
 	//-------------   GAME LOOP START   ---------------	
 	while (1) {
+#ifdef DEVELOPING_MODE
+		if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON))
+			printf("\n( %d , %d )", GetMouseX(), GetMouseY());
+#endif
 		if (WindowShouldClose())
 			CloseWindow();
 		
@@ -214,7 +287,6 @@ void mainGame() {
 		BeginDrawing();
 		ClearBackground(BLACK);
 		BeginMode2D(camera);
-
 		// Draw Base A
 		DrawRectangleRec(baseA.rect, baseA.color);
 		// Draw Border 
@@ -248,10 +320,23 @@ void mainGame() {
 #endif
 
 		EndMode2D();
+		// Draw things which are not in 2d Mode
+		// draw Header on top
+		DrawRectangle(0, 0, screenWidth, headerHeight, LIME);
+		char player_1_money_text[50];
+		char player_2_money_text[50];
+		char turn_text[30];
+		sprintf(player_1_money_text, "%s's Money : %d", player_1_name, player_1_money);
+		sprintf(player_2_money_text, "%s's Money : %d", player_2_name, player_2_money);
+		sprintf(turn_text, "Turn : %d", turn);
+		DrawText(player_1_money_text, 59, 33, 30, WHITE);
+		DrawText(player_2_money_text, 1183, 33, 30, WHITE);
+		DrawText(turn_text, 674, 33, 30, WHITE);
+
+
 		EndDrawing();
 	}
 }
-
 
 
 
