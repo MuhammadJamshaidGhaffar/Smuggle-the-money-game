@@ -1,112 +1,33 @@
-# Raylib Setup using Premake5
-This is a simplified set of instructions for how to setup a project using premake.
+# Smuggle the Money Game
 
-## Video Tutorial
-A video covering this process is here
-https://youtu.be/--gI9083QnU
+There are 2 countries. One is on the left and one is on the right.
 
-# Download this repository
-Download the game premake repository from 
-https://github.com/raylib-extras/game-premake/
-You can either download the zip file, or clone the repository.
-If you clone the repository, you may want to remove the stored history. Simply delete the .git directory to do this.
+ <img width="800" alt="game_map" src="https://user-images.githubusercontent.com/75721211/210014056-3619d36c-976d-4586-b244-b31491fc4c06.PNG">
 
-Rename the directory whatever you want. This will be the name of your game.
+Two countries have invested 1 lac in other country . Now two countries are at the verge of war . War can broke out at any moment. So, before war breaks both countries are trying their best to smuggle their invested money from opposite country. They will send their agents turn by turn.
 
-#(OPTIONAL) Get Raylib
-If you wish to use a specific version of raylib, follow the instructions below. If you want the current development version, skip this section and premake will download raylib for you.
-
-## Download Raylib
-Get the raylib sources from 
-https://github.com/raysan5/raylib
-Download the zip file, or clone the repository. It doesn't matter what one you use.
-Put the raylib sources in a folder called raylib inside your game folder (The same folder this file is in). The folder must be named raylib, it can not be raylib-master. The raylib folder should contain all the sources from raylib (including the 'src' folder)
-
-# Example app
-This repository is pre-populated wit the raylib game template. It is a great starting point for your game.
-https://github.com/raysan5/raylib-game-template
-
-If you want to have a different starting point, simply replace the files in the game folder with your own files.
-
-## Using C++
-By default this process is setup to build a project using C. If you want to use C++, you can replace your files with you own cpp files. There is is a simple C++ file in the _app dir. The raylib template is designed for C, not C++, but the version in this repository has been modified to work as C++ if you choose to rename the files.
-
-# Generate Projects
-For windows users, there are two batch files you can use depending on what compiler you are using. For linux users you can simply use a terminal.
-Only do ONE of these options depending on your compiler and platform.
-## Windows Users
-Visual Studio users should run
-
-    premake-VisualStudio.bat
+Turn 1 :
+       
+       Agent from left country comes into the right country through crossing the border. 
+       After passsing through the border gate, gate will be closed and will not open . 
+       Agent has to find the money bag in a limited time.
+       
+       If agent fails to find the money bag oppsoite country will capture the agent
+       and will trade the agent with a large amount of money. So, ultimately opposite country wins.
+       
+	If agent finds the money bag, agent will enter the money he wants to smuggle. 
+	Agent can't carry more than 50 lacs in one turn. After entering the money agent
+	will go into the inspection room because he  cannot go back from the border .
+	Now inspector from oppsite country comes to inspect the agent. 
+	Inspector will decide to inspect the agent or let the agent pass(no inspection)
 	
-This will generate a Visual Studio project.
-	
-## MinGW-w64 Users
-Please make sure you have a recent version of MinGW-W64. The older versons from mingw.org will not work.
-We recomend the W64Devkit. I thas everything needed to build raylib. I can be downloaded from here https://github.com/skeeto/w64devkit/releases
+	If inspector press the pass button then no inspection will be done and money
+	will be smuggled by the agent.
+	But if inspector presses the inspect button then inspector has to predict how much money agent
+	is gambling. If inspector's guess is within +- 10k range then inspector will
+	get all the smuggled money. 
+	But if inspector guesses the wrong then agent will get all the smuggled money + half of the money
+	guessed by the inspector and inspector will lose half of the guessed money
 
-Once you have MinGW-W64
-Run the batch file.
 
-    premake-mingw.bat
-
-This will generate a makefile for you
-	
-## Linux users
-cd to the game folder and run
-
-    ./premake5 gmake2
-
-This will generate a makefile for you.
-
-## macOS users
-cd to the game folder and run
-
-    ./premake5.osx gmake2
-	
-This will generate a makefile for you.
-
-# Build your game
-Only do ONE of these options depending on your compiler and platform.
-## Windows Users
-Double click the .sln file that was generated in the folder. If you are using Visual Studio 2022 you will be asked to upgrade the project, the defaults are fine, accept them and it will load.
-From here you can use the project as normal.
-	
-## MinGW-w64 Users
-Open your compiler terminal (w64devkit if you are using it), change to the game folder and type 
-
-    make
-	
-This will build your game
-	
-## Linux/macOS users
-Open your terminal, change to the game folder and type.
-
-    make
-	
-This will build your starting game template
-	
-	
-# Building for other OpenGL targets
-If you need to build for a different OpenGL version than the default (OpenGL 3.3) you can specify an openGL version in your premake command line. Just modify the bat file or add the following to your command line
-
-## For OpenGL 1.1
---graphics=opengl11
-
-## For OpenGL 2.1
---graphics=opengl21
-
-## For OpenGL 4.3
---graphics=opengl43
-
-# Building extra libs
-If you need to add a separate library to your game you can do that very easily.
-Simply copy the _lib folder and rename it to what you want your lib to be called.
-Replace lib.c with the sources for your library (just copy them in the folder).
-If you library has an include folder, copy that too.
-Then go to the premake5.lua file in the game folder, and link your library by calling link_to with the folder name for the library.
-
-link_to("LIB_FOLDER_NAME")
-
-Rerun premake and it will build your library for you.
-Note that by default link_to will add include dirs for your library folder and library/include. If you have other include needs you will have to add those to your premake file manually.
+After 6 turns which country smuggled more will win
